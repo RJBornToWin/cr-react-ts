@@ -1,26 +1,46 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// Api
+import { fetchCharacter } from './api';
+// Components
+import Card from './components/Card';
+// Types
+import { Character } from './api';
+// Styles
+import { Wrapper } from './App.styles';
 
-function App() {
+const App: React.FC = () => {
+  const [character, setCharacter] = React.useState<Character>({} as Character);
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [characterId, setCharacterId] = React.useState<number>(1);
+
+  React.useEffect(()=> {
+    const fetchDataFromApi = async () => {
+      setIsLoading(true);
+      const result = await fetchCharacter(characterId);
+      setCharacter(result);
+      setIsLoading(false);
+    }
+
+    fetchDataFromApi();
+  }, [characterId]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Wrapper characterId={characterId}>
+      {
+        isLoading ? 
+        (
+          <div>Loading...</div>
+        ) 
+        : 
+        (
+          <>
+            <Card name={character.name} imgUrl={character.img_url} gender={character.gender}/>
+            <button onClick={(e)=>{setCharacterId(Math.floor(Math.random()*10)+1)}}>Next Character</button>
+          </>
+        )
+      }
+    </Wrapper>
   );
-}
+};
 
 export default App;
